@@ -6,6 +6,9 @@ import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
   {
+    ignores: ['node_modules/', 'dist/', 'build/', 'coverage/', '.angular/', '*.spec.ts'],
+  },
+  {
     files: ['**/*.ts'],
     extends: [
       eslint.configs.recommended,

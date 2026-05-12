@@ -1,0 +1,76 @@
+import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { DividerModule } from 'primeng/divider';
+import { MessageService } from 'primeng/api';
+
+import { Account } from '../../core/models/banking.models';
+import { AccountService } from '../../core/services/account.service';
+
+@Component({
+  selector: 'app-accounts-page',
+  imports: [ButtonModule, CardModule, DecimalPipe, DividerModule, RouterLink],
+  templateUrl: './accounts-page.component.html',
+  styleUrl: './accounts-page.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class AccountsPageComponent {
+  private readonly accountService = inject(AccountService);
+  private readonly messageService = inject(MessageService);
+
+  readonly accounts = signal<Account[]>([]);
+  readonly loading = signal(true);
+  readonly error = signal<string | null>(null);
+  readonly hasAccounts = computed(() => this.accounts().length > 0);
+
+  constructor() {
+    this.loadAccounts();
+  }
+
+  reload(): void {
+    this.loadAccounts();
+  }
+
+  accountLabel(account: Account): string {
+    return account.name ?? account.owner ?? account.iban ?? `Account #${account.id}`;
+  }
+
+  accountDetails(account: Account): string {
+    const details = [account.number, account.currency].filter(Boolean);
+    return details.length > 0 ? details.join(' · ') : 'Available account';
+  }
+
+  private loadAccounts(): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.accountService
+      .getAccounts()
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: (accounts) => {
+          this.accounts.set(accounts);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Loaded',
+            detail: `${accounts.length} account(s) loaded.`,
+            life: 3000,
+          });
+        },
+        error: () => {
+          this.accounts.set([]);
+          const message = 'Unable to load accounts. Check that the backend is running.';
+          this.error.set(message);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: message,
+            life: 5000,
+          });
+        },
+      });
+  }
+}

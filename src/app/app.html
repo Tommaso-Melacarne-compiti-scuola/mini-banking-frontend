@@ -1,0 +1,37 @@
+<div
+  class="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.18),_transparent_34%),linear-gradient(180deg,_#07111f_0%,_#091627_45%,_#f4f7fb_45%,_#f4f7fb_100%)] text-slate-900"
+>
+  <p-toast />
+
+  <header
+    class="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-6 sm:px-6 lg:px-8"
+  >
+    <a
+      routerLink="/accounts"
+      class="inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-white shadow-[0_20px_80px_rgba(15,23,42,0.32)] backdrop-blur"
+    >
+      <span
+        class="grid h-11 w-11 place-items-center rounded-xl bg-cyan-400/20 text-xl font-black text-cyan-200"
+      >
+        MB
+      </span>
+      <span class="flex flex-col">
+        <span class="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100/75"
+          >Mini Banking</span
+        >
+        <span class="text-base font-medium text-white">Accounts and movements</span>
+      </span>
+    </a>
+
+    <p-button
+      routerLink="/accounts"
+      label="Accounts"
+      icon="pi pi-wallet"
+      styleClass="!rounded-2xl !border-white/20 !bg-white/10 !text-white hover:!bg-white/15"
+    />
+  </header>
+
+  <main class="mx-auto w-full max-w-7xl px-4 pb-10 sm:px-6 lg:px-8">
+    <router-outlet />
+  </main>
+</div>

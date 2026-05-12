@@ -1,0 +1,247 @@
+<section class="space-y-6">
+  <div
+    class="rounded-4xl border border-slate-200 bg-white/95 p-6 shadow-[0_24px_120px_rgba(15,23,42,0.12)] backdrop-blur sm:p-8"
+  >
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <div class="space-y-3">
+        <a
+          routerLink="/accounts"
+          class="inline-flex items-center gap-2 text-sm font-semibold text-cyan-700"
+        >
+          <i class="pi pi-arrow-left"></i>
+          Back to accounts
+        </a>
+        <div>
+          <span
+            class="inline-flex rounded-full border border-cyan-200 bg-cyan-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-cyan-800"
+          >
+            Account dashboard
+          </span>
+          <h1 class="mt-3 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+            {{ accountLabel() }}
+          </h1>
+          <p class="mt-2 text-slate-600">{{ accountSubtitle() }}</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <p-button
+          label="Deposit"
+          icon="pi pi-plus"
+          (onClick)="openTransactionDialog('deposit')"
+          styleClass="!rounded-2xl"
+        />
+        <p-button
+          label="Withdrawal"
+          icon="pi pi-minus"
+          severity="secondary"
+          (onClick)="openTransactionDialog('withdrawal')"
+          styleClass="!rounded-2xl"
+        />
+      </div>
+    </div>
+
+    <p-divider />
+
+    @if (error()) {
+      <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-800">
+        {{ error() }}
+      </div>
+    }
+
+    <div class="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+      <p-card styleClass="rounded-3xl border border-slate-200 shadow-sm">
+        <ng-template pTemplate="header">
+          <div class="border-b border-slate-200 px-5 py-4">
+            <p class="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-700">Balance</p>
+            <h2 class="text-xl font-semibold text-slate-950">
+              {{ balance()?.balance ?? 0 | number: '1.2-2' }}
+            </h2>
+          </div>
+        </ng-template>
+
+        <div class="space-y-4">
+          <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
+            <label class="space-y-2 text-sm font-medium text-slate-700">
+              Convert to
+              <input
+                pInputText
+                type="text"
+                [formControl]="balanceForm.controls.to"
+                placeholder="USD or BTC"
+                class="w-full rounded-2xl"
+              />
+            </label>
+
+            <div class="flex items-end gap-2">
+              <p-button
+                label="Fiat"
+                icon="pi pi-wallet"
+                severity="secondary"
+                (onClick)="convertBalance('fiat')"
+                [loading]="saving() && conversionKind() === 'fiat'"
+              />
+              <p-button
+                label="Crypto"
+                icon="pi pi-bitcoin"
+                severity="secondary"
+                (onClick)="convertBalance('crypto')"
+                [loading]="saving() && conversionKind() === 'crypto'"
+              />
+            </div>
+          </div>
+
+          @if (conversion()) {
+            <div class="rounded-2xl bg-cyan-50 px-4 py-3 text-sm text-cyan-950">
+              <p class="font-semibold">Conversion result</p>
+              <p>
+                {{ conversion()?.original_balance | number: '1.2-2' }}
+                →
+                {{ conversion()?.converted_balance | number: '1.2-2' }}
+                {{ conversion()?.currency }}
+              </p>
+            </div>
+          }
+        </div>
+      </p-card>
+
+      <p-card styleClass="rounded-3xl border border-slate-200 shadow-sm">
+        <ng-template pTemplate="header">
+          <div class="border-b border-slate-200 px-5 py-4">
+            <p class="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-700">Summary</p>
+            <h2 class="text-xl font-semibold text-slate-950">Transactions</h2>
+          </div>
+        </ng-template>
+
+        <div class="grid gap-3 sm:grid-cols-2">
+          <div class="rounded-2xl bg-slate-50 px-4 py-3">
+            <p class="text-sm text-slate-500">Count</p>
+            <p class="text-2xl font-semibold text-slate-950">{{ totalTransactions() }}</p>
+          </div>
+          <div class="rounded-2xl bg-slate-50 px-4 py-3">
+            <p class="text-sm text-slate-500">Balance state</p>
+            <p class="text-2xl font-semibold text-slate-950">
+              {{ (balance()?.balance ?? 0 >= 0) ? 'Positive' : 'Negative' }}
+            </p>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <p-card
+    styleClass="rounded-[2rem] border border-slate-200 bg-white/95 shadow-[0_24px_120px_rgba(15,23,42,0.12)] backdrop-blur"
+  >
+    <ng-template pTemplate="header">
+      <div class="border-b border-slate-200 px-5 py-4">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-700">History</p>
+        <h2 class="text-xl font-semibold text-slate-950">Movements</h2>
+      </div>
+    </ng-template>
+
+    <p-table
+      [value]="transactions()"
+      [tableStyle]="{ 'min-width': '48rem' }"
+      [rowHover]="true"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Date</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Description</th>
+          <th class="w-48">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-transaction>
+        <tr>
+          <td>{{ transaction.created_at | date: 'medium' }}</td>
+          <td class="font-semibold text-slate-700">{{ transaction.type }}</td>
+          <td
+            class="font-semibold"
+            [class.text-emerald-700]="transaction.type === 'deposit'"
+            [class.text-rose-700]="transaction.type === 'withdrawal'"
+          >
+            {{ transaction.amount | number: '1.2-2' }}
+          </td>
+          <td>{{ transaction.description }}</td>
+          <td>
+            <div class="flex flex-wrap gap-2">
+              <p-button
+                label="Edit"
+                icon="pi pi-pen-to-square"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="openTransactionDialog(transaction.type, transaction)"
+              />
+              <p-button
+                label="Delete"
+                icon="pi pi-trash"
+                severity="danger"
+                [outlined]="true"
+                (onClick)="confirmDelete(transaction)"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="py-10 text-center text-slate-500">No transactions found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</section>
+
+<p-dialog
+  [visible]="transactionDialogVisible()"
+  (visibleChange)="transactionDialogVisible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(42rem, 95vw)' }"
+  [header]="
+    transactionDialogMode() === 'edit'
+      ? 'Edit description'
+      : transactionDialogMode() === 'deposit'
+        ? 'Register deposit'
+        : 'Register withdrawal'
+  "
+>
+  <form class="space-y-5" [formGroup]="transactionForm" (ngSubmit)="saveTransaction()">
+    <label class="block space-y-2 text-sm font-medium text-slate-700">
+      Amount
+      <input
+        pInputText
+        type="number"
+        formControlName="amount"
+        min="0.01"
+        step="0.01"
+        [readonly]="transactionDialogMode() === 'edit'"
+        class="w-full rounded-2xl"
+      />
+    </label>
+
+    <label class="block space-y-2 text-sm font-medium text-slate-700">
+      Description
+      <input pInputText type="text" formControlName="description" class="w-full rounded-2xl" />
+    </label>
+
+    <div class="flex items-center justify-end gap-3 pt-2">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        type="button"
+        (onClick)="closeTransactionDialog()"
+      />
+      <p-button label="Save" icon="pi pi-check" type="submit" [loading]="saving()" />
+    </div>
+  </form>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '30rem' }" />

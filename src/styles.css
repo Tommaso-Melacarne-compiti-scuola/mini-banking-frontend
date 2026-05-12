@@ -1,3 +1,29 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+:root {
+  color-scheme: light;
+  font-family: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  background: #f4f7fb;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top, rgba(34, 211, 238, 0.12), transparent 28%),
+    linear-gradient(180deg, #07111f 0%, #091627 30%, #f4f7fb 30%, #f4f7fb 100%);
+  color: #0f172a;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
