@@ -35,12 +35,22 @@ export class AccountsPageComponent {
   }
 
   accountLabel(account: Account): string {
-    return account.name ?? account.owner ?? account.iban ?? `Account #${account.id}`;
+    return (
+      account.ownerName ?? account.name ?? account.owner ?? account.iban ?? `Account #${account.id}`
+    );
   }
 
   accountDetails(account: Account): string {
     const details = [account.number, account.currency].filter(Boolean);
-    return details.length > 0 ? details.join(' · ') : 'Available account';
+    if (details.length > 0) {
+      return details.join(' · ');
+    }
+
+    if (account.createdAt) {
+      return `Created on ${account.createdAt}`;
+    }
+
+    return 'Available account';
   }
 
   private loadAccounts(): void {

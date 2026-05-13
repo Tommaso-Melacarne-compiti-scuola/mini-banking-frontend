@@ -78,7 +78,9 @@ export class AccountDetailComponent {
       return `Account #${this.accountId}`;
     }
 
-    return account.name ?? account.owner ?? account.iban ?? `Account #${account.id}`;
+    return (
+      account.ownerName ?? account.name ?? account.owner ?? account.iban ?? `Account #${account.id}`
+    );
   });
 
   readonly accountSubtitle = computed(() => {
@@ -88,7 +90,15 @@ export class AccountDetailComponent {
     }
 
     const details = [account.number, account.currency].filter(Boolean);
-    return details.length > 0 ? details.join(' · ') : 'Account details';
+    if (details.length > 0) {
+      return details.join(' · ');
+    }
+
+    if (account.createdAt) {
+      return `Created on ${account.createdAt}`;
+    }
+
+    return 'Account details';
   });
 
   readonly totalTransactions = computed(() => this.transactions().length);

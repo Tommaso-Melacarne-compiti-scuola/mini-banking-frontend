@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://172.24.102.115",
+    "target": "https://boat-must-except-retreat.trycloudflare.com/",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {
