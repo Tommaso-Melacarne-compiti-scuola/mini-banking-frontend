@@ -58,7 +58,8 @@
               "buildTarget": "mini-banking-frontend:build:production"
             },
             "development": {
-              "buildTarget": "mini-banking-frontend:build:development"
+              "buildTarget": "mini-banking-frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
