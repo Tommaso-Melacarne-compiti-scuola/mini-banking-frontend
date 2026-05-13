@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
@@ -12,7 +11,7 @@ import { AccountService } from '../../core/services/account.service';
 
 @Component({
   selector: 'app-accounts-page',
-  imports: [ButtonModule, CardModule, DecimalPipe, DividerModule, RouterLink],
+  imports: [ButtonModule, CardModule, DividerModule, RouterLink],
   templateUrl: './accounts-page.component.html',
   styleUrl: './accounts-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,17 +39,16 @@ export class AccountsPageComponent {
     );
   }
 
-  accountDetails(account: Account): string {
-    const details = [account.number, account.currency].filter(Boolean);
-    if (details.length > 0) {
-      return details.join(' · ');
+  getAccountCreationDate(account: Account): string {
+    if (!account.createdAt) {
+      return 'Unknown date';
     }
-
-    if (account.createdAt) {
-      return `Created on ${account.createdAt}`;
-    }
-
-    return 'Available account';
+    const date = new Date(account.createdAt);
+    return date.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
   }
 
   private loadAccounts(): void {

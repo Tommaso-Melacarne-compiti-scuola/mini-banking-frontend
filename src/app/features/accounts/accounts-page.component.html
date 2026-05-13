@@ -2,21 +2,10 @@
   <div
     class="overflow-hidden rounded-4xl border border-slate-200 bg-white/90 p-6 shadow-[0_24px_120px_rgba(15,23,42,0.12)] backdrop-blur sm:p-8"
   >
-    <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-      <div class="max-w-3xl space-y-4">
-        <span
-          class="inline-flex rounded-full border border-cyan-200 bg-cyan-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-cyan-800"
-        >
-          Overview
-        </span>
-        <h1 class="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-          Select an account and inspect its transactions, balance, and conversions.
-        </h1>
-        <p class="max-w-2xl text-base leading-7 text-slate-600">
-          The frontend is wired to the PHP backend endpoints for accounts, balances, conversions,
-          deposits, withdrawals, updates, and deletes.
-        </p>
-      </div>
+    <div class="flex justify-between gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <h1 class="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+        Select an account
+      </h1>
 
       <p-button
         label="Reload accounts"
@@ -46,31 +35,27 @@
             <ng-template pTemplate="header">
               <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
                 <div>
-                  <p class="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-700">
-                    Account
-                  </p>
                   <h2 class="text-xl font-semibold text-slate-950">{{ accountLabel(account) }}</h2>
                 </div>
                 <span
                   class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700"
                 >
-                  #{{ account.id }}
+                  {{ account.currency }}
                 </span>
               </div>
             </ng-template>
 
             <div class="space-y-4 text-sm text-slate-600">
-              <p>{{ accountDetails(account) }}</p>
-              @if (account.balance !== undefined) {
-                <p class="text-lg font-semibold text-slate-950">
-                  Balance: {{ account.balance | number: '1.2-2' }}
-                </p>
+              @if (account.createdAt) {
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-calendar text-slate-400"></i>
+                  <span>Created on {{ getAccountCreationDate(account) }}</span>
+                </div>
               }
             </div>
 
             <ng-template pTemplate="footer">
               <div class="flex items-center justify-between gap-3 pt-3">
-                <span class="text-sm text-slate-500">Live backend data</span>
                 <a
                   pButton
                   [routerLink]="['/accounts', account.id]"
