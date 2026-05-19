@@ -61,12 +61,6 @@ export class AccountsPageComponent {
       .subscribe({
         next: (accounts) => {
           this.accounts.set(accounts);
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Loaded',
-            detail: `${accounts.length} account(s) loaded.`,
-            life: 3000,
-          });
         },
         error: () => {
           this.accounts.set([]);

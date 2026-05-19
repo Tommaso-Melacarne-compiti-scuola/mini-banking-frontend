@@ -45,7 +45,7 @@
     }
 
     <div class="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-      <p-card styleClass="rounded-3xl border border-slate-200 shadow-sm">
+      <p-card class="rounded-3xl border border-slate-200 shadow-sm">
         <ng-template pTemplate="header">
           <div class="border-b border-slate-200 px-5 py-4">
             <p class="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-700">Balance</p>
@@ -100,32 +100,12 @@
         </div>
       </p-card>
 
-      <p-card styleClass="rounded-3xl border border-slate-200 shadow-sm">
-        <ng-template pTemplate="header">
-          <div class="border-b border-slate-200 px-5 py-4">
-            <p class="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-700">Summary</p>
-            <h2 class="text-xl font-semibold text-slate-950">Transactions</h2>
-          </div>
-        </ng-template>
 
-        <div class="grid gap-3 sm:grid-cols-2">
-          <div class="rounded-2xl bg-slate-50 px-4 py-3">
-            <p class="text-sm text-slate-500">Count</p>
-            <p class="text-2xl font-semibold text-slate-950">{{ totalTransactions() }}</p>
-          </div>
-          <div class="rounded-2xl bg-slate-50 px-4 py-3">
-            <p class="text-sm text-slate-500">Balance state</p>
-            <p class="text-2xl font-semibold text-slate-950">
-              {{ (balance()?.balance ?? 0 >= 0) ? 'Positive' : 'Negative' }}
-            </p>
-          </div>
-        </div>
-      </p-card>
     </div>
   </div>
 
   <p-card
-    styleClass="rounded-[2rem] border border-slate-200 bg-white/95 shadow-[0_24px_120px_rgba(15,23,42,0.12)] backdrop-blur"
+    class="rounded-4xl border border-slate-200 bg-white/95 shadow-[0_24px_120px_rgba(15,23,42,0.12)] backdrop-blur"
   >
     <ng-template pTemplate="header">
       <div class="border-b border-slate-200 px-5 py-4">
@@ -138,7 +118,7 @@
       [value]="transactions()"
       [tableStyle]="{ 'min-width': '48rem' }"
       [rowHover]="true"
-      styleClass="p-datatable-sm"
+      class="p-datatable-sm w-full"
     >
       <ng-template pTemplate="header">
         <tr>
@@ -162,7 +142,7 @@
             {{ transaction.amount | number: '1.2-2' }}
           </td>
           <td>{{ transaction.description }}</td>
-          <td>
+          <td class="flex items-center justify-center">
             <p-button
               icon="pi pi-pencil"
               severity="secondary"
