@@ -19,11 +19,13 @@ import { AccountService } from '../../core/services/account.service';
 export class AccountsPageComponent {
   private readonly accountService = inject(AccountService);
   private readonly messageService = inject(MessageService);
+  private loadSequence = 0;
 
   readonly accounts = signal<Account[]>([]);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly hasAccounts = computed(() => this.accounts().length > 0);
+  readonly skeletonCards = [1, 2, 3];
 
   constructor() {
     this.loadAccounts();
@@ -52,6 +54,7 @@ export class AccountsPageComponent {
   }
 
   private loadAccounts(): void {
+    const currentLoad = ++this.loadSequence;
     this.loading.set(true);
     this.error.set(null);
 
@@ -60,9 +63,17 @@ export class AccountsPageComponent {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (accounts) => {
+          if (currentLoad !== this.loadSequence) {
+            return;
+          }
+
           this.accounts.set(accounts);
         },
         error: () => {
+          if (currentLoad !== this.loadSequence) {
+            return;
+          }
+
           this.accounts.set([]);
           const message = 'Unable to load accounts. Check that the backend is running.';
           this.error.set(message);

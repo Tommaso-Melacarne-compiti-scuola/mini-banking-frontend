@@ -8,9 +8,20 @@
   >
     <a
       routerLink="/accounts"
-      class="w-full text-white! text-2xl text-center font-semibold uppercase tracking-[0.24em]"
+      class="inline-flex items-center gap-3 text-white"
+      aria-label="Mini Banking home"
     >
-      Mini Banking
+      <span
+        class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-lg font-semibold tracking-tight backdrop-blur"
+      >
+        MB
+      </span>
+      <span class="text-left">
+        <span class="block text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200">
+          Mini Banking
+        </span>
+        <span class="block text-sm text-slate-200">Accounts and transfers</span>
+      </span>
     </a>
   </header>
 

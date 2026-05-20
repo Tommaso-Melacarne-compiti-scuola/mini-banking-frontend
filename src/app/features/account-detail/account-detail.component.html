@@ -74,14 +74,14 @@
                 icon="pi pi-wallet"
                 severity="secondary"
                 (onClick)="convertBalance('fiat')"
-                [loading]="saving() && conversionKind() === 'fiat'"
+                [loading]="conversionSaving() && conversionKind() === 'fiat'"
               />
               <p-button
                 label="Crypto"
                 icon="pi pi-bitcoin"
                 severity="secondary"
                 (onClick)="convertBalance('crypto')"
-                [loading]="saving() && conversionKind() === 'crypto'"
+                [loading]="conversionSaving() && conversionKind() === 'crypto'"
               />
             </div>
           </div>
@@ -99,8 +99,6 @@
           }
         </div>
       </p-card>
-
-
     </div>
   </div>
 
@@ -148,13 +146,15 @@
               severity="secondary"
               text
               [outlined]="true"
-              (onClick)="openTransactionDialog(transaction.type, transaction)"
+              ariaLabel="Edit transaction description"
+              (onClick)="openEditTransactionDialog(transaction)"
             />
             <p-button
               icon="pi pi-trash"
               severity="danger"
               text
               [outlined]="true"
+              ariaLabel="Delete transaction"
               (onClick)="confirmDelete(transaction)"
             />
           </td>
@@ -177,13 +177,7 @@
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(42rem, 95vw)' }"
-  [header]="
-    transactionDialogMode() === 'edit'
-      ? 'Edit description'
-      : transactionDialogMode() === 'deposit'
-        ? 'Register deposit'
-        : 'Register withdrawal'
-  "
+  [header]="transactionDialogTitle()"
 >
   <form class="space-y-5" [formGroup]="transactionForm" (ngSubmit)="saveTransaction()">
     <label class="block space-y-2 text-sm font-medium text-slate-700">
@@ -194,7 +188,7 @@
         formControlName="amount"
         min="0.01"
         step="0.01"
-        [readonly]="transactionDialogMode() === 'edit'"
+        [readonly]="isEditingTransaction()"
         class="w-full rounded-2xl"
       />
     </label>
@@ -212,7 +206,7 @@
         type="button"
         (onClick)="closeTransactionDialog()"
       />
-      <p-button label="Save" icon="pi pi-check" type="submit" [loading]="saving()" />
+      <p-button label="Save" icon="pi pi-check" type="submit" [loading]="transactionSaving()" />
     </div>
   </form>
 </p-dialog>

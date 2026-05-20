@@ -2,16 +2,22 @@
   <div
     class="overflow-hidden rounded-4xl border border-slate-200 bg-white/90 p-6 shadow-[0_24px_120px_rgba(15,23,42,0.12)] backdrop-blur sm:p-8"
   >
-    <div class="flex justify-between gap-6 lg:flex-row lg:items-end lg:justify-between">
-      <h1 class="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-        Select an account
-      </h1>
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div class="space-y-2">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-700">
+          Accounts overview
+        </p>
+        <h1 class="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+          Select an account
+        </h1>
+      </div>
 
       <p-button
         label="Reload accounts"
         icon="pi pi-refresh"
         [outlined]="true"
         (onClick)="reload()"
+        ariaLabel="Reload account list"
         styleClass="!rounded-2xl !border-slate-300 !text-slate-700 hover:!bg-slate-50"
       />
     </div>
@@ -20,8 +26,11 @@
 
     @if (loading()) {
       <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        @for (index of [1, 2, 3]; track index) {
-          <div class="h-40 animate-pulse rounded-3xl bg-slate-100"></div>
+        @for (index of skeletonCards; track index) {
+          <div
+            aria-hidden="true"
+            class="h-40 animate-pulse rounded-3xl border border-slate-200 bg-slate-100"
+          ></div>
         }
       </div>
     } @else if (error()) {
@@ -60,6 +69,7 @@
                   pButton
                   [routerLink]="['/accounts', account.id]"
                   icon="pi pi-arrow-right"
+                  aria-label="Open account details"
                   class="rounded-2xl"
                 >
                   Open
