@@ -19,7 +19,6 @@ import {
   Account,
   BalanceConversionResponse,
   BalanceResponse,
-  ConversionKind,
   Transaction,
 } from '../../core/models/banking.models';
 import { AccountService } from '../../core/services/account.service';
@@ -27,6 +26,7 @@ import { TransactionService } from '../../core/services/transaction.service';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { StateMessageComponent } from '../../shared/components/state-message.component';
 import { AccountBalanceCardComponent } from './components/account-balance-card.component';
+import { CurrencyConversionDialogComponent } from './components/currency-conversion-dialog/currency-conversion-dialog.component';
 import { TransactionDialogComponent } from './components/transaction-dialog.component';
 import { TransactionHistoryTableComponent } from './components/transaction-history-table.component';
 
@@ -36,6 +36,7 @@ import { TransactionHistoryTableComponent } from './components/transaction-histo
     ButtonModule,
     AccountBalanceCardComponent,
     ConfirmDialogModule,
+    CurrencyConversionDialogComponent,
     DividerModule,
     ReactiveFormsModule,
     RouterLink,
@@ -67,19 +68,16 @@ export class AccountDetailComponent {
   readonly account = signal<Account | null>(null);
   readonly transactions = signal<Transaction[]>([]);
   readonly balance = signal<BalanceResponse | null>(null);
-  readonly conversion = signal<BalanceConversionResponse | null>(null);
   readonly loading = signal(true);
   readonly transactionSaving = signal(false);
-  readonly conversionSaving = signal(false);
   readonly error = signal<string | null>(null);
   readonly transactionDialogVisible = signal(false);
   readonly transactionDialogMode = signal<'deposit' | 'withdrawal' | 'edit'>('deposit');
   readonly selectedTransaction = signal<Transaction | null>(null);
-  readonly conversionKind = signal<ConversionKind>('fiat');
-
-  readonly balanceForm = this.formBuilder.nonNullable.group({
-    to: ['USD', [Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
-  });
+  readonly currencyConversionDialogVisible = signal(false);
+  readonly currencyConversionSaving = signal(false);
+  readonly currencyConversionResult = signal<BalanceConversionResponse | null>(null);
+  readonly currencyConversionError = signal<string | null>(null);
 
   readonly transactionForm = this.formBuilder.nonNullable.group({
     amount: [0, [Validators.required, Validators.min(0.01)]],
@@ -257,24 +255,31 @@ export class AccountDetailComponent {
     });
   }
 
-  convertBalance(kind: ConversionKind): void {
-    if (this.balanceForm.invalid || this.conversionSaving()) {
-      this.balanceForm.markAllAsTouched();
-      return;
-    }
+  openCurrencyConversionDialog(): void {
+    this.currencyConversionError.set(null);
+    this.currencyConversionResult.set(null);
+    this.currencyConversionDialogVisible.set(true);
+  }
 
-    const to = this.balanceForm.controls.to.value.trim().toUpperCase();
-    this.conversionKind.set(kind);
-    this.conversionSaving.set(true);
-    this.error.set(null);
+  closeCurrencyConversionDialog(): void {
+    this.currencyConversionDialogVisible.set(false);
+    this.currencyConversionResult.set(null);
+    this.currencyConversionError.set(null);
+  }
+
+  convertBalanceFromDialog(event: { currency: string; kind: 'fiat' | 'crypto' }): void {
+    this.currencyConversionSaving.set(true);
+    this.currencyConversionError.set(null);
+    this.currencyConversionResult.set(null);
+
     const accountId = this.accountId();
 
     this.accountService
-      .convertBalance(accountId, kind, to)
-      .pipe(finalize(() => this.conversionSaving.set(false)))
+      .convertBalance(accountId, event.kind, event.currency)
+      .pipe(finalize(() => this.currencyConversionSaving.set(false)))
       .subscribe({
         next: (result) => {
-          this.conversion.set(result);
+          this.currencyConversionResult.set(result);
           this.messageService.add({
             severity: 'success',
             summary: 'Converted',
@@ -284,7 +289,7 @@ export class AccountDetailComponent {
         },
         error: () => {
           const message = 'Balance conversion failed.';
-          this.error.set(message);
+          this.currencyConversionError.set(message);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
@@ -315,7 +320,6 @@ export class AccountDetailComponent {
           this.account.set(accounts.find((item) => item.id === accountId) ?? null);
           this.balance.set(balance);
           this.transactions.set(transactions);
-          this.conversion.set(null);
         },
         error: () => {
           if (currentLoad !== this.loadSequence) {

@@ -1,0 +1,98 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(42rem, 95vw)' }"
+  [contentStyle]="{ overflow: 'visible' }"
+  header="Convert Balance"
+>
+  <div class="space-y-5">
+    <label class="block space-y-2 text-sm font-medium text-slate-700">
+      Target Currency
+      <p-select
+        [ngModel]="selectedCurrency()"
+        (ngModelChange)="selectedCurrency.set($event)"
+        [options]="currencies()"
+        optionLabel="name"
+        optionValue="code"
+        placeholder="Select a currency"
+        [showClear]="true"
+        [filter]="true"
+        filterBy="name,code"
+        class="w-full"
+      >
+        <ng-template pTemplate="selecteditem" let-selectedOption>
+          @if (selectedOption) {
+            <div class="flex items-center gap-2">
+              <span class="font-mono font-bold text-slate-900">{{ selectedOption.code }}</span>
+              <span class="text-slate-600">- {{ selectedOption.name }}</span>
+            </div>
+          }
+        </ng-template>
+        <ng-template pTemplate="option" let-currency>
+          <div class="flex items-center justify-between w-full">
+            <div class="flex items-center gap-2">
+              <span class="font-mono font-bold">{{ currency.code }}</span>
+              <span class="text-slate-600">{{ currency.name }}</span>
+            </div>
+            @if (currency.isCrypto) {
+              <span class="text-[10px] bg-cyan-100 text-cyan-700 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">Crypto</span>
+            } @else {
+              <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">Fiat</span>
+            }
+          </div>
+        </ng-template>
+      </p-select>
+    </label>
+
+    @if (selectedCurrency() && detectedType()) {
+      <div class="rounded-2xl bg-cyan-50 px-4 py-3 text-sm text-cyan-950">
+        <p class="font-semibold">
+          Converting to <span class="font-mono font-bold">{{ selectedCurrency() }}</span>
+          ({{ detectedType() === 'crypto' ? '💰 Crypto' : '💵 Fiat' }})
+        </p>
+      </div>
+    }
+
+    @if (result()) {
+      <div class="rounded-2xl bg-green-50 px-4 py-3 text-sm text-green-950 border border-green-200">
+        <p class="font-semibold">✓ Conversion result</p>
+        <p class="mt-2">
+          {{ result()?.original_balance | number: '1.2-2' }}
+          <span class="mx-2">→</span>
+          {{ result()?.converted_balance | number: '1.2-8' }}
+          <span class="font-mono font-bold">{{ result()?.currency }}</span>
+        </p>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-950 border border-red-200">
+        <p class="font-semibold">✕ Conversion failed</p>
+        <p class="mt-1">{{ error() }}</p>
+      </div>
+    }
+
+    <div class="flex items-center justify-end gap-3 pt-2">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        type="button"
+        (onClick)="dismiss.emit()"
+      />
+      <p-button
+        label="Convert"
+        icon="pi pi-check"
+        [disabled]="!selectedCurrency()"
+        [loading]="saving()"
+        (onClick)="save.emit({
+          currency: selectedCurrency(),
+          kind: (detectedType() || 'fiat')
+        })"
+      />
+    </div>
+  </div>
+</p-dialog>
