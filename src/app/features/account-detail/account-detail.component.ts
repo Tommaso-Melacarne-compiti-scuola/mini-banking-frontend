@@ -1,4 +1,3 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,13 +11,9 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize, forkJoin, map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
-import { InputTextModule } from 'primeng/inputtext';
-import { TableModule } from 'primeng/table';
 
 import {
   Account,
@@ -29,21 +24,25 @@ import {
 } from '../../core/models/banking.models';
 import { AccountService } from '../../core/services/account.service';
 import { TransactionService } from '../../core/services/transaction.service';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
+import { StateMessageComponent } from '../../shared/components/state-message.component';
+import { AccountBalanceCardComponent } from './components/account-balance-card.component';
+import { TransactionDialogComponent } from './components/transaction-dialog.component';
+import { TransactionHistoryTableComponent } from './components/transaction-history-table.component';
 
 @Component({
   selector: 'app-account-detail',
   imports: [
     ButtonModule,
-    CardModule,
+    AccountBalanceCardComponent,
     ConfirmDialogModule,
-    DatePipe,
-    DecimalPipe,
-    DialogModule,
     DividerModule,
-    InputTextModule,
     ReactiveFormsModule,
     RouterLink,
-    TableModule,
+    PageHeaderComponent,
+    StateMessageComponent,
+    TransactionDialogComponent,
+    TransactionHistoryTableComponent,
   ],
   templateUrl: './account-detail.component.html',
   styleUrl: './account-detail.component.css',
@@ -90,7 +89,7 @@ export class AccountDetailComponent {
   readonly accountLabel = computed(() => {
     const account = this.account();
     if (!account) {
-      return `Account #${this.accountId}`;
+      return `Account #${this.accountId()}`;
     }
 
     return (

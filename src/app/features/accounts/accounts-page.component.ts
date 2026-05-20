@@ -1,17 +1,26 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
+import { RouterLink } from '@angular/router';
 
 import { Account } from '../../core/models/banking.models';
 import { AccountService } from '../../core/services/account.service';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
+import { SkeletonGridComponent } from '../../shared/components/skeleton-grid.component';
+import { StateMessageComponent } from '../../shared/components/state-message.component';
 
 @Component({
   selector: 'app-accounts-page',
-  imports: [ButtonModule, CardModule, DividerModule, RouterLink],
+  imports: [
+    ButtonModule,
+    DividerModule,
+    PageHeaderComponent,
+    RouterLink,
+    SkeletonGridComponent,
+    StateMessageComponent,
+  ],
   templateUrl: './accounts-page.component.html',
   styleUrl: './accounts-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,7 +34,6 @@ export class AccountsPageComponent {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly hasAccounts = computed(() => this.accounts().length > 0);
-  readonly skeletonCards = [1, 2, 3];
 
   constructor() {
     this.loadAccounts();
@@ -45,7 +53,9 @@ export class AccountsPageComponent {
     if (!account.createdAt) {
       return 'Unknown date';
     }
+
     const date = new Date(account.createdAt);
+
     return date.toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'long',

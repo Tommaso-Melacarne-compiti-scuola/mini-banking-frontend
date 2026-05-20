@@ -1,13 +1,10 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { AppShellComponent } from './shared/components/app-shell.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterLink, RouterOutlet, ToastModule],
-  templateUrl: './app.html',
+  imports: [AppShellComponent],
+  template: '<app-shell />',
   styleUrl: './app.css',
-  providers: [MessageService],
 })
 export class App {}
