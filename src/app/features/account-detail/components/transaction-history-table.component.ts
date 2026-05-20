@@ -32,7 +32,7 @@ import { Transaction } from '../../../core/models/banking.models';
             <th>Type</th>
             <th>Amount</th>
             <th>Description</th>
-            <th class="w-48">Actions</th>
+            <th>Actions</th>
           </tr>
         </ng-template>
 
